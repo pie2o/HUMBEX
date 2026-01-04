@@ -18,25 +18,29 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20' # utiliser Node 20 pour compatibilité
 
-      - name: Install supabase CLI
-        run: npm install -g supabase
+      - name: Install supabase CLI (local)
+        run: |
+          # Installe le package localement dans le workspace (pas globalement)
+          npm install supabase --no-save
 
       - name: Supabase login
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
-          supabase login --token "$SUPABASE_ACCESS_TOKEN"
+          # Utilise npx pour exécuter le binaire installé localement
+          npx supabase login --token "$SUPABASE_ACCESS_TOKEN"
 
       - name: Link project
-        run: supabase link --project-ref "$SUPABASE_REF"
+        run: |
+          npx supabase link --project-ref "$SUPABASE_REF"
 
       - name: Push DB migrations
         env:
           SUPABASE_REF: ${{ secrets.SUPABASE_REF }}
         run: |
-          supabase db push --project-ref "$SUPABASE_REF"
+          npx supabase db push --project-ref "$SUPABASE_REF"
 
       - name: Run backend tests (example)
         env:
