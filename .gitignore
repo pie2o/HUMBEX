@@ -33,8 +33,9 @@ htmlcov/
 # Virtual environments
 venv/
 ENV/
-env/
+.env/
 .venv
+.env
 
 # Environment variables
 .env
