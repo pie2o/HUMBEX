@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: humbex-db
+    environment:
+      POSTGRES_USER: humbex
+      POSTGRES_PASSWORD: humbex_dev_password
+      POSTGRES_DB: humbex
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U humbex"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: humbex-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://humbex:humbex_dev_password@db:5432/humbex
+      - TRADINGVIEW_SECRET=${TRADINGVIEW_SECRET:-changeme}
+      - ENCRYPTION_KEY_HEX=${ENCRYPTION_KEY_HEX:-changeme}
+      - BACKEND_HOST=0.0.0.0
+      - BACKEND_PORT=8000
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./backend/app:/app/app
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    container_name: humbex-worker
+    environment:
+      - DATABASE_URL=postgresql://humbex:humbex_dev_password@db:5432/humbex
+      - ENCRYPTION_KEY_HEX=${ENCRYPTION_KEY_HEX:-changeme}
+      - WORKER_POLL_INTERVAL=${WORKER_POLL_INTERVAL:-5}
+      - CCXT_TEST_MODE=${CCXT_TEST_MODE:-true}
+    depends_on:
+      - db
+      - backend
+    restart: unless-stopped
+    volumes:
+      - ./worker:/app
+
+volumes:
+  postgres_data:
