@@ -1,0 +1,91 @@
+name: CI - HUMBEX
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  backend-check:
+    name: Backend Smoke Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install backend dependencies
+      working-directory: ./backend
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Install ccxt for tests
+      run: pip install ccxt
+    
+    - name: Smoke test - Import backend modules
+      run: |
+        cd backend
+        python -c "from app import main, db, models, crypto; print('✓ Backend imports successful')"
+        python -c "from app.services import ccxt_client; print('✓ CCXT client import successful')"
+    
+    - name: Smoke test - Import worker module
+      run: |
+        python -c "import sys; sys.path.insert(0, 'backend'); import worker.worker; print('✓ Worker import successful')"
+
+  docker-build:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build backend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        file: ./backend/Dockerfile
+        push: false
+        tags: humbex-backend:test
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: Build worker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./worker/Dockerfile
+        push: false
+        tags: humbex-worker:test
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  lint:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Check Python syntax
+      run: |
+        python -m py_compile backend/app/*.py
+        python -m py_compile backend/app/services/*.py
+        python -m py_compile worker/*.py
+        echo "✓ Python syntax check passed"
