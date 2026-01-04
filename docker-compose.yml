@@ -52,8 +52,6 @@ services:
       - db
       - backend
     restart: unless-stopped
-    volumes:
-      - ./worker:/app
 
 volumes:
   postgres_data:
