@@ -1,4 +1,5 @@
 import os
+from typing import Tuple
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.backends import default_backend
 
@@ -28,7 +29,7 @@ class CryptoManager:
         
         self.aesgcm = AESGCM(self.key)
     
-    def encrypt(self, plaintext: str) -> tuple[str, str]:
+    def encrypt(self, plaintext: str) -> Tuple[str, str]:
         """
         Encrypt plaintext using AES-GCM
         

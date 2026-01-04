@@ -40,8 +40,8 @@ services:
 
   worker:
     build:
-      context: ./worker
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./worker/Dockerfile
     container_name: humbex-worker
     environment:
       - DATABASE_URL=postgresql://humbex:humbex_dev_password@db:5432/humbex

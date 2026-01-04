@@ -138,6 +138,8 @@ def process_signal(db: Session, signal: Signal):
         )
         
         # Format symbol for CCXT (e.g., AVAXUSDT -> AVAX/USDT:USDT)
+        # Note: This assumes quote currency is always 4 characters (USDT)
+        # TODO: Add more robust symbol parsing for different quote currencies
         symbol_formatted = f"{signal.symbol[:-4]}/{signal.symbol[-4:]}:{signal.symbol[-4:]}"
         
         # Execute trade based on action
@@ -175,6 +177,7 @@ def process_signal(db: Session, signal: Signal):
         
         elif signal.action == "close":
             # Determine side based on current position (simplified: use sell to close long)
+            # TODO: Query actual position to determine correct side (buy for short, sell for long)
             order_response = client.close_position(
                 symbol=symbol_formatted,
                 side="sell",
@@ -226,6 +229,7 @@ def run_worker():
     log("=" * 60)
     
     while True:
+        db = None
         try:
             db = SessionLocal()
             
@@ -240,8 +244,6 @@ def run_worker():
                 for signal in pending_signals:
                     process_signal(db, signal)
             
-            db.close()
-            
             # Wait before next poll
             time.sleep(WORKER_POLL_INTERVAL)
         
@@ -252,6 +254,10 @@ def run_worker():
         except Exception as e:
             log(f"Worker error: {str(e)}")
             time.sleep(WORKER_POLL_INTERVAL)
+        
+        finally:
+            if db:
+                db.close()
 
 
 if __name__ == "__main__":

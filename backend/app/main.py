@@ -3,6 +3,7 @@ import hmac
 import hashlib
 from datetime import datetime
 from typing import Optional
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import JSONResponse
@@ -12,10 +13,22 @@ from sqlalchemy.orm import Session
 from .db import get_db, engine, Base
 from .models import Signal
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initialize database tables on startup"""
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as e:
+        print(f"Warning: Could not create tables: {e}")
+    yield
+
+
 app = FastAPI(
     title="HUMBEX API",
     description="AVAXUSDT Perpetual Trading Bot - TradingView Webhook Receiver",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Environment variables
@@ -49,15 +62,6 @@ def verify_signature(body: bytes, signature: str) -> bool:
     ).hexdigest()
     
     return hmac.compare_digest(signature.lower(), expected_signature.lower())
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database tables on startup"""
-    try:
-        Base.metadata.create_all(bind=engine)
-    except Exception as e:
-        print(f"Warning: Could not create tables: {e}")
 
 
 @app.get("/health")
