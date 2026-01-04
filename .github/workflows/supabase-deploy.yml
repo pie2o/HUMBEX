@@ -1,0 +1,46 @@
+name: Supabase CI - migrations & tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  supabase:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_REF: ${{ secrets.SUPABASE_REF }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install supabase CLI
+        run: npm install -g supabase
+
+      - name: Supabase login
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          supabase login --token "$SUPABASE_ACCESS_TOKEN"
+
+      - name: Link project
+        run: supabase link --project-ref "$SUPABASE_REF"
+
+      - name: Push DB migrations
+        env:
+          SUPABASE_REF: ${{ secrets.SUPABASE_REF }}
+        run: |
+          supabase db push --project-ref "$SUPABASE_REF"
+
+      - name: Run backend tests (example)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ENCRYPTION_KEY_HEX: ${{ secrets.ENCRYPTION_KEY_HEX }}
+        run: |
+          echo "Remplace par tes commandes de test backend (pytest, etc.)"
