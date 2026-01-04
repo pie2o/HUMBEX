@@ -1,29 +1,36 @@
-# HUMBEX Dashboard
 
-## Overview
+# Tableau de bord HUMBEX
 
-This directory is a placeholder for the future Next.js dashboard application.
+## Vue d’ensemble
 
-## Planned Features
+Ce répertoire est un **placeholder** pour la future application **Next.js** du tableau de bord.
 
-- User authentication and registration
-- Subscription management
-- API key management (encrypted storage)
-- Trading signal history
-- Order history and analytics
-- Account balance monitoring
-- Real-time notifications
+---
 
-## Technology Stack (Planned)
+## Fonctionnalités prévues
 
-- **Framework**: Next.js 14+ (App Router)
-- **UI Library**: React + Tailwind CSS
-- **State Management**: React Query / Zustand
-- **Charts**: Recharts / TradingView widgets
-- **API Client**: Axios / Fetch
-- **Authentication**: JWT tokens
+* Authentification et inscription des utilisateurs
+* Gestion des abonnements
+* Gestion des clés API (stockage chiffré)
+* Historique des signaux de trading
+* Historique des ordres et analyses
+* Suivi du solde du compte
+* Notifications en temps réel
 
-## Development (Future)
+---
+
+## Stack technologique (prévue)
+
+* **Framework** : Next.js 14+ (App Router)
+* **Bibliothèque UI** : React + Tailwind CSS
+* **Gestion d’état** : React Query / Zustand
+* **Graphiques** : Recharts / Widgets TradingView
+* **Client API** : Axios / Fetch
+* **Authentification** : JWT tokens
+
+---
+
+## Développement (futur)
 
 ```bash
 cd dashboard
@@ -31,17 +38,24 @@ npm install
 npm run dev
 ```
 
-Dashboard will be available at `http://localhost:3000`
+Le tableau de bord sera disponible sur `http://localhost:3000`
 
-## Integration
+---
 
-The dashboard will communicate with the backend API at:
-- Local: `http://localhost:8000`
-- Production: `https://api.humbex.com`
+## Intégration
 
-## Security
+Le tableau de bord communiquera avec l’API backend à :
 
-- All API keys encrypted before transmission
-- HTTPS only in production
-- JWT-based authentication
-- CORS configured for frontend domain only
+* Local : `http://localhost:8000`
+* Production : `https://api.humbex.com`
+
+---
+
+## Sécurité
+
+* Toutes les clés API chiffrées avant transmission
+* HTTPS uniquement en production
+* Authentification basée sur JWT
+* CORS configuré uniquement pour le domaine frontend
+
+---
