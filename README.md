@@ -1,7 +1,3 @@
-Bien sûr ! Voici la **version traduite en français**, prête à copier-coller :
-
----
-
 # HUMBEX - Bot de trading AVAXUSDT Perpétuel
 
 ## Vue d’ensemble
