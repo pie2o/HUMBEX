@@ -1,193 +1,233 @@
-# HUMBEX - AVAXUSDT Perpetual Trading Bot
+Bien sûr ! Voici la **version traduite en français**, prête à copier-coller :
 
-## Overview
+---
 
-HUMBEX is an automated trading bot for AVAXUSDT perpetual futures on Bybit. The system receives TradingView webhook signals, processes them securely, and executes trades using user-provided API keys (encrypted at rest).
+# HUMBEX - Bot de trading AVAXUSDT Perpétuel
+
+## Vue d’ensemble
+
+HUMBEX est un bot de trading automatisé pour les contrats **AVAXUSDT perpétuels** sur **Bybit**. Le système reçoit les signaux webhook de TradingView, les traite de manière sécurisée et exécute les trades en utilisant les clés API fournies par l’utilisateur (chiffrées au repos).
+
+---
 
 ## Architecture
 
-This is a monorepo containing:
+Ceci est un **monorepo** contenant :
 
-- **Backend (FastAPI)**: REST API for webhook reception, user management, and encrypted API key storage
-- **Worker**: Background process that polls for new signals and executes trades via CCXT
-- **Dashboard**: (Placeholder) Next.js frontend for user management and monitoring
-- **Database**: PostgreSQL (via Supabase) for storing users, subscriptions, API keys, signals, and orders
+* **Backend (FastAPI)** : API REST pour la réception des webhooks, la gestion des utilisateurs et le stockage chiffré des clés API
+* **Worker** : processus en arrière-plan qui récupère les nouveaux signaux et exécute les trades via CCXT
+* **Dashboard** : (placeholder) frontend Next.js pour la gestion des utilisateurs et le monitoring
+* **Base de données** : PostgreSQL (via Supabase) pour stocker utilisateurs, abonnements, clés API, signaux et ordres
 
-## Features
+---
 
-- ✅ TradingView webhook integration with HMAC-SHA256 signature verification
-- ✅ AES-GCM encryption for API keys at rest
-- ✅ Dry-run mode by default (safe testing without real trades)
-- ✅ Multi-user support with subscription management
-- ✅ Docker Compose orchestration
-- ✅ Minimal CI/CD pipeline
+## Fonctionnalités
 
-## Security
+* ✅ Intégration webhook TradingView avec vérification de signature HMAC-SHA256
+* ✅ Chiffrement AES-GCM des clés API au repos
+* ✅ Mode **dry-run** par défaut (tests sécurisés sans trades réels)
+* ✅ Support multi-utilisateur avec gestion des abonnements
+* ✅ Orchestration Docker Compose
+* ✅ Pipeline CI/CD minimal
 
-- **HMAC Webhook Verification**: All TradingView webhooks must include a valid `X-Signature` header
-- **API Key Encryption**: Bybit API keys are encrypted using AES-GCM with a 256-bit key
-- **Environment Secrets**: Sensitive data stored in environment variables (never in code)
-- **Read-Only Trading Keys**: Users should create Bybit API keys with trading permissions enabled but withdrawals disabled
+---
 
-## Quick Start
+## Sécurité
 
-### Prerequisites
+* **Vérification HMAC Webhook** : tous les webhooks TradingView doivent inclure un header `X-Signature` valide
+* **Chiffrement des clés API** : les clés Bybit sont chiffrées avec AES-GCM 256 bits
+* **Secrets d’environnement** : données sensibles stockées dans des variables d’environnement (jamais dans le code)
+* **Clés de trading uniquement** : les utilisateurs doivent créer des clés API Bybit avec **trading activé** et **retraits désactivés**
 
-- Docker & Docker Compose
-- Supabase account (for PostgreSQL database)
+---
 
-### Setup
+## Démarrage rapide
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/pie2o/HUMBEX.git
-   cd HUMBEX
-   ```
+### Prérequis
 
-2. **Generate secrets**
-   ```bash
-   # TradingView webhook secret
-   openssl rand -hex 32
-   
-   # Encryption key for API keys
-   openssl rand -hex 32
-   ```
+* Docker & Docker Compose
+* Compte Supabase (pour PostgreSQL)
 
-3. **Configure environment**
-   ```bash
-   cp .env.example .env
-   # Edit .env and add your generated secrets and DATABASE_URL from Supabase
-   ```
+### Installation
 
-4. **Start services**
-   ```bash
-   docker compose up --build
-   ```
+1. **Cloner le dépôt**
 
-5. **Verify health**
-   ```bash
-   curl http://localhost:8000/health
-   ```
+```bash
+git clone https://github.com/pie2o/HUMBEX.git
+cd HUMBEX
+```
 
-## API Endpoints
+2. **Générer les secrets**
+
+```bash
+# Secret webhook TradingView
+openssl rand -hex 32
+
+# Clé de chiffrement pour les clés API
+openssl rand -hex 32
+```
+
+3. **Configurer l’environnement**
+
+```bash
+cp .env.example .env
+# Modifier .env pour ajouter vos secrets générés et DATABASE_URL de Supabase
+```
+
+4. **Lancer les services**
+
+```bash
+docker compose up --build
+```
+
+5. **Vérifier la santé**
+
+```bash
+curl http://localhost:8000/health
+```
+
+---
+
+## Endpoints API
 
 ### Health Check
+
 ```
 GET /health
 ```
 
-### TradingView Webhook
+### Webhook TradingView
+
 ```
 POST /webhook
 Headers:
-  X-Signature: <HMAC-SHA256 hex signature>
+  X-Signature: <signature hex HMAC-SHA256>
 Body:
 {
-  "token": "user_token",
+  "token": "token_utilisateur",
   "action": "buy|sell|close",
   "symbol": "AVAXUSDT",
   "quantity": 1.0
 }
 ```
 
-## Environment Variables
+---
 
-### Required (Production)
+## Variables d’environnement
 
-- `TRADINGVIEW_SECRET`: Shared secret for webhook HMAC verification
-- `ENCRYPTION_KEY_HEX`: 32-byte hex key for AES-GCM encryption
-- `DATABASE_URL`: PostgreSQL connection string from Supabase
+### Obligatoires (Production)
 
-### Optional
+* `TRADINGVIEW_SECRET` : Secret partagé pour la vérification HMAC du webhook
+* `ENCRYPTION_KEY_HEX` : Clé hexadécimale 32 bytes pour chiffrement AES-GCM
+* `DATABASE_URL` : Chaîne de connexion PostgreSQL depuis Supabase
 
-- `BACKEND_PORT`: Backend server port (default: 8000)
-- `WORKER_POLL_INTERVAL`: Worker polling interval in seconds (default: 5)
-- `CCXT_TEST_MODE`: Enable dry-run mode (default: true)
+### Optionnelles
 
-## Database Schema
+* `BACKEND_PORT` : Port du backend (par défaut : 8000)
+* `WORKER_POLL_INTERVAL` : Intervalle de polling du worker en secondes (par défaut : 5)
+* `CCXT_TEST_MODE` : Activer le mode dry-run (par défaut : true)
+
+---
+
+## Schéma de la base de données
 
 ### Tables
 
-1. **users**: User accounts and authentication
-2. **subscriptions**: User subscription status and expiry
-3. **api_keys**: Encrypted Bybit API keys (stored as `api_key_enc` + `iv`)
-4. **signals**: TradingView webhook signals received
-5. **orders**: Trade execution records
+1. **users** : Comptes utilisateurs et authentification
+2. **subscriptions** : Statut et expiration de l’abonnement
+3. **api_keys** : Clés API Bybit chiffrées (stockées sous `api_key_enc` + `iv`)
+4. **signals** : Signaux reçus via webhook TradingView
+5. **orders** : Historique des trades exécutés
 
-## Development Workflow
+---
 
-### Local Testing
+## Workflow de développement
 
-1. Start the services with `docker compose up`
-2. Backend runs on `http://localhost:8000`
-3. Test webhook with HMAC signature:
-   ```bash
-   # Calculate signature
-   echo -n '{"token":"test","action":"buy","symbol":"AVAXUSDT","quantity":1.0}' | \
-     openssl dgst -sha256 -hmac "your_tradingview_secret" | cut -d' ' -f2
-   
-   # Send request
-   curl -X POST http://localhost:8000/webhook \
-     -H "Content-Type: application/json" \
-     -H "X-Signature: <calculated_signature>" \
-     -d '{"token":"test","action":"buy","symbol":"AVAXUSDT","quantity":1.0}'
-   ```
+### Test local
 
-### Running Tests
+1. Lancer les services avec `docker compose up`
+2. Backend accessible sur `http://localhost:8000`
+3. Tester le webhook avec signature HMAC :
 
 ```bash
-# Backend tests
+# Calculer la signature
+echo -n '{"token":"test","action":"buy","symbol":"AVAXUSDT","quantity":1.0}' | \
+  openssl dgst -sha256 -hmac "votre_secret_tradingview" | cut -d' ' -f2
+
+# Envoyer la requête
+curl -X POST http://localhost:8000/webhook \
+  -H "Content-Type: application/json" \
+  -H "X-Signature: <signature_calculée>" \
+  -d '{"token":"test","action":"buy","symbol":"AVAXUSDT","quantity":1.0}'
+```
+
+### Tests unitaires
+
+```bash
+# Backend
 cd backend
 pip install -r requirements.txt
 python -m pytest
 
-# Worker tests
+# Worker
 cd worker
 python -m pytest
 ```
 
-## Deployment
+---
 
-### Digital Ocean App Platform
+## Déploiement
 
-1. Create a new app from this GitHub repository
-2. Configure environment variables in the DO dashboard
-3. Set build commands for backend and worker services
-4. Enable HTTPS and configure firewall rules
+### DigitalOcean App Platform
 
-### Environment Variables (Production)
+1. Créer une nouvelle app depuis le dépôt GitHub
+2. Configurer les variables d’environnement dans le dashboard DO
+3. Définir les commandes de build pour backend et worker
+4. Activer HTTPS et configurer le firewall
 
-Set these in your deployment platform's secrets/environment configuration:
+---
 
-- `DATABASE_URL`: Your Supabase connection string
-- `TRADINGVIEW_SECRET`: Generated secret (32-byte hex)
-- `ENCRYPTION_KEY_HEX`: Generated encryption key (32-byte hex)
-- `CCXT_TEST_MODE`: Set to `false` only after thorough testing
+### Variables d’environnement (Production)
 
-## Security Checklist (Before Production)
+* `DATABASE_URL` : Chaîne de connexion Supabase
+* `TRADINGVIEW_SECRET` : Secret généré (32 bytes hex)
+* `ENCRYPTION_KEY_HEX` : Clé de chiffrement (32 bytes hex)
+* `CCXT_TEST_MODE` : `false` uniquement après tests complets
 
-- [ ] Replace all test secrets in `.env.example` with real values (stored securely)
-- [ ] Verify Bybit API keys have trading ON / withdrawal OFF
-- [ ] Store `ENCRYPTION_KEY_HEX` in platform secrets (DO/Supabase)
-- [ ] Enable HTTPS on all endpoints
-- [ ] Configure firewall rules
-- [ ] Never log API keys or secrets in plaintext
-- [ ] Implement admin flow for token activation after MEXC payment
-- [ ] Test end-to-end with Bybit testnet first
-- [ ] Add idempotence and anti-replay (timestamp validation)
-- [ ] Set up monitoring & alerting (Sentry, centralized logs)
+---
+
+## Checklist sécurité (avant production)
+
+* [ ] Remplacer tous les secrets test par des valeurs réelles (stockées en sécurité)
+* [ ] Vérifier que les clés API Bybit ont **trading ON / retrait OFF**
+* [ ] Stocker `ENCRYPTION_KEY_HEX` dans les secrets de la plateforme (DO/Supabase)
+* [ ] Activer HTTPS sur tous les endpoints
+* [ ] Configurer les règles firewall
+* [ ] Ne jamais loguer les clés API ou secrets en clair
+* [ ] Implémenter le flux d’activation de token après paiement MEXC
+* [ ] Tester end-to-end sur Bybit testnet
+* [ ] Ajouter idempotence et anti-replay (validation timestamp)
+* [ ] Mettre en place monitoring & alerting (Sentry ou logs centralisés)
+
+---
 
 ## CI/CD
 
-Minimal CI workflow included:
-- Install dependencies
-- Run import smoke tests
-- (Future) Linting, unit tests, Docker builds, automated deployment
+Pipeline minimal inclus :
 
-## License
+* Installer les dépendances
+* Tests d’import smoke tests
+* (Future) Linting, tests unitaires, builds Docker, déploiement automatique
+
+---
+
+## Licence
 
 MIT
 
+---
+
 ## Support
 
-For issues or questions, please open an issue on GitHub.
+Pour toute question ou problème, ouvrir un issue sur GitHub.
+
