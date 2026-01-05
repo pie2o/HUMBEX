@@ -32,7 +32,7 @@ jobs:
           # Utilise npx pour exécuter le binaire installé localement
           npx supabase login --token "$SUPABASE_ACCESS_TOKEN"
 
-      - name: Link project
+            - name: Link project
         run: |
           npx supabase link --project-ref "$SUPABASE_REF"
 
@@ -40,7 +40,10 @@ jobs:
         env:
           SUPABASE_REF: ${{ secrets.SUPABASE_REF }}
         run: |
-          npx supabase db push --project-ref "$SUPABASE_REF"
+          # Après link, db push sans --project-ref
+          npx supabase db push
+          # ou, si tu préfères être explicite :
+          # npx supabase db push --linked
 
       - name: Run backend tests (example)
         env:
