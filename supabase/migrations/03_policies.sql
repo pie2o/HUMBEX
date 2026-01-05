@@ -1,5 +1,4 @@
-
---- 03_policies.sql
+-- 03_policies.sql
 -- Activer Row Level Security et policies de base pour HUMBEX
 -- Idempotent : DROP POLICY IF EXISTS avant CREATE, et cast explicite auth.uid()::uuid
 
